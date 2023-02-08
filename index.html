@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Caesar Cipher</title>
+        <style>
+            body {
+                font-family: Arial;
+            }
+            h1,
+            h3 {
+                text-align: center;
+            }
+            .wrapper {
+                display: flex;
+                gap: 1em;
+                max-width: 1000px;
+                margin: 2em auto;
+            }
+            form {
+                border: 1px solid black;
+                padding: 1em;
+            }
+            .info {
+                max-width: 1000px;
+                margin: 2em auto;
+                line-height: 2em;
+            }
+            a {
+                font-weight: bold;
+            }
+            span {
+                background-color: rgb(250, 62, 62);
+                padding: 0 0.2em;
+            }
+            button {
+                background-color: limegreen;
+                border: none;
+                padding: 0.2em 0.4em;
+                cursor: pointer;
+            }
+            button:hover {
+                background-color: yellowgreen;
+            }
+        </style>
+    </head>
+    <body>
+        <header><h1>CAESAR CIPHER</h1></header>
+        <div><h3>John Loyd H. Mulit</h3></div>
+        <div class="wrapper">
+            <form>
+                <div>
+                    <input type="text" name="input" id="input" />
+                    <label for="input">Text to encrypt</label>
+                </div>
+                <br />
+                <div>
+                    <input type="number" name="shift" id="shift" />
+                    <label for="shift">Shift key</label>
+                </div>
+                <br />
+                <div>
+                    <button type="button" onclick="encrypt()">Encrypt</button>
+                </div>
+                <br />
+                <textarea
+                    name="cipher"
+                    id="cipher"
+                    placeholder="Encrypted text`"
+                    disabled
+                    cols="30"
+                    rows="10"
+                ></textarea>
+            </form>
+
+            <form>
+                <div>
+                    <input type="text" name="text" id="text" />
+                    <label for="input">Text to decrypt</label>
+                </div>
+                <br />
+                <div>
+                    <input
+                        type="number"
+                        name="decypt-shift"
+                        id="decrypt-shift"
+                    />
+                    <label for="shift">Shift key</label>
+                </div>
+                <br />
+                <div>
+                    <button type="button" onclick="decrypt()">Decrypt</button>
+                </div>
+                <br />
+                <textarea
+                    name="decrypted"
+                    id="decrypted"
+                    placeholder="Decrypted text"
+                    disabled
+                    cols="30"
+                    rows="10"
+                ></textarea>
+            </form>
+
+            <div class="options">
+                <input
+                    type="checkbox"
+                    name="reverse"
+                    id="reverse"
+                    onchange="getDirection()"
+                />
+                <label for="reverse">Reverse shift direction</label>
+            </div>
+        </div>
+        <div class="info">
+            <p>
+                This is a Caesar Cipher implementation in JavaScript. This is
+                based on the work of
+                <a href="https://github.com/AlanCowap-OCJA2015" target="_blank"
+                    >AlanCowap-OCJA2015</a
+                >
+                from Github. The original source code is written in java and can
+                be found
+                <a
+                    href="https://github.com/AlanCowap-OCJA2015/CaesarCipher/blob/master/OCJA_CodeChallenges/src/com/ocja/smsm/ccipher/CaesarCipher.java"
+                    target="_blank"
+                    >here</a
+                >. The <span>reverse</span> option is an added feature in the
+                original source code. The reverse option, if checked, will
+                reverse the shifting direction. If reversed, character shift
+                will go backwards.
+            </p>
+        </div>
+    </body>
+    <script>
+        let alphabet = 'abcdefghijklmnopqrstuvwxyz'
+        let checkbox = document.getElementById('reverse')
+        let reverse = false
+
+        //Get the direction of key-shift. Reverse = left, non-reverse = right
+        function getDirection() {
+            if (checkbox.checked == true) {
+                reverse = true
+            } else {
+                reverse = false
+            }
+        }
+
+        //Encrypt the inputed text by the shift value
+        function encrypt() {
+            let input = document
+                .getElementById('input')
+                .value.replace(/\s+/g, '')
+                .toLowerCase()
+            let shift = Number(document.getElementById('shift').value)
+            let textarea = document.getElementById('cipher')
+            let cipher = ''
+
+            inputArray = input.split('')
+
+            for (let i = 0; i < inputArray.length; i++) {
+                //Check if reverse-shift is turned on
+                if (reverse) {
+                    //Check if shift key will overflow from the alphabet
+                    let index = alphabet.indexOf(inputArray[i]) - shift
+
+                    if (index < 0) {
+                        //if shift will overflow, circle back to last character in the alphabet
+                        let overflow = alphabet.length + index
+                        cipher += alphabet.charAt(overflow)
+                    } else {
+                        cipher += alphabet.charAt(index)
+                    }
+                } else {
+                    //Run code below if reverse-shift is not on
+                    let index = alphabet.indexOf(inputArray[i]) + shift + 1
+
+                    if (index > alphabet.length) {
+                        //if shift will overflow, circle back to first character in the alphabet
+                        let overflow = index - alphabet.length
+                        cipher += alphabet.charAt(--overflow)
+                    } else {
+                        cipher += alphabet.charAt(--index)
+                    }
+                }
+            }
+            textarea.value = cipher
+        }
+
+        //Decrypt the cipher text with the given shift key
+        function decrypt() {
+            let text = document
+                .getElementById('text')
+                .value.replace(/\s+/g, '')
+                .toLowerCase()
+            let decryptKey = Number(
+                document.getElementById('decrypt-shift').value
+            )
+            let decryptedText = document.getElementById('decrypted')
+            let originalText = ''
+
+            textArray = text.split('')
+
+            for (let i = 0; i < textArray.length; i++) {
+                if (reverse) {
+                    let index = alphabet.indexOf(textArray[i]) + decryptKey + 1
+
+                    if (index > alphabet.length) {
+                        let overflow = index - alphabet.length
+                        originalText += alphabet.charAt(--overflow)
+                    } else {
+                        originalText += alphabet.charAt(--index)
+                    }
+                } else {
+                    let index = alphabet.indexOf(textArray[i]) - decryptKey
+
+                    if (index < 0) {
+                        let overflow = alphabet.length + index
+                        originalText += alphabet.charAt(overflow)
+                    } else {
+                        originalText += alphabet.charAt(index)
+                    }
+                }
+            }
+            decryptedText.value = originalText
+        }
+    </script>
+</html>
